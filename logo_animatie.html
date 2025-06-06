@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logo Intro</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+      font-family: sans-serif;
+      height: 100%;
+      width: 100%;
+    }
+
+    /* Spacer buiten zoom-wrapper: zorgt dat Hostinger genoeg ruimte reserveert */
+    .spacer {
+      height: 1050px;
+      width: 100%;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .zoom-wrapper {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .content {
+      width: 800px;
+      height: 1050px;
+      transform-origin: top left;
+    }
+
+    .container {
+      position: relative;
+      height: 650px;
+      width: 800px;
+      background: black;
+      z-index: 1;
+      animation: backgroundFade 1s ease forwards;
+      animation-delay: 3s;
+      animation-fill-mode: forwards;
+    }
+
+    .logo {
+      width: 150px;
+      height: auto;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      opacity: 1;
+      animation: krimpEnBeweegLinksBoven 3s forwards;
+    }
+
+    @keyframes krimpEnBeweegLinksBoven {
+      0% {
+        transform: translate(-50%, -50%) scale(2);
+        filter: drop-shadow(0 0 30px white) drop-shadow(0 0 60px white);
+        opacity: 1;
+      }
+      50% {
+        transform: translate(-50%, -50%) scale(1.4);
+        filter: drop-shadow(0 0 25px white) drop-shadow(0 0 40px white);
+        opacity: 1;
+      }
+      80% {
+        filter: drop-shadow(0 0 10px white);
+      }
+      100% {
+        transform: translate(calc(-50% - 525px), calc(-50% - 240px)) scale(0.6);
+        filter: none;
+        opacity: 1;
+      }
+    }
+
+    @keyframes backgroundFade {
+      to {
+        background-color: transparent;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Spacer buiten zoom-wrapper -->
+  <div class="spacer"></div>
+
+  <!-- Geschaalde content -->
+  <div class="zoom-wrapper" id="zoom-wrapper">
+    <div class="content" id="content">
+      <div class="container">
+        <img src="https://assets.zyrosite.com/mP4OJyV5LeFy8jWD/logo4k_licht-YNqBvwj28ESreGoK.png" alt="Logo" class="logo">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function applyZoom() {
+      const wrapper = document.getElementById('zoom-wrapper');
+      const content = document.getElementById('content');
+      const scale = wrapper.clientWidth / 800;
+      content.style.zoom = scale;
+    }
+
+    window.addEventListener('resize', applyZoom);
+    window.addEventListener('DOMContentLoaded', applyZoom);
+  </script>
+
+</body>
+</html>
