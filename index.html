@@ -53,29 +53,23 @@
     const createScene = async () => {
       const scene = new BABYLON.Scene(engine);
       scene.clearColor = new BABYLON.Color4(1, 1, 1, 1); // witte achtergrond
+      scene.environmentTexture = null;
 
-      const target = new BABYLON.Vector3(0, -1.5, 0); // 👈 model veel lager in frame
+      const target = new BABYLON.Vector3(0, 0.5, 0); // model lager in beeld
 
       const camera = new BABYLON.ArcRotateCamera(
         "camera",
         Math.PI / 2,
         Math.PI / 2.5,
-        10, // zoomniveau
+        7, // zoomniveau
         target,
         scene
       );
       camera.attachControl(canvas, true);
-
       camera.lowerRadiusLimit = camera.upperRadiusLimit = camera.radius;
 
       const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
       light.intensity = 1.2;
-
-      const env = scene.createDefaultEnvironment({
-        createSkybox: false,
-        createGround: false,
-        environmentIntensity: 1.5
-      });
 
       await BABYLON.SceneLoader.ImportMeshAsync(
         "", 
