@@ -54,13 +54,13 @@
       const scene = new BABYLON.Scene(engine);
       scene.clearColor = new BABYLON.Color4(1, 1, 1, 1); // witte achtergrond
 
-      const target = new BABYLON.Vector3(0, 0.5, 0); // model lager in beeld
+      const target = new BABYLON.Vector3(0, 0.8, 0); // model lager in beeld
 
       const camera = new BABYLON.ArcRotateCamera(
         "camera",
         Math.PI / 2,
         Math.PI / 2.5,
-        10, // zoomniveau
+        12, // zoomniveau
         target,
         scene
       );
