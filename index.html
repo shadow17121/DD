@@ -53,7 +53,6 @@
     const createScene = async () => {
       const scene = new BABYLON.Scene(engine);
       scene.clearColor = new BABYLON.Color4(1, 1, 1, 1); // witte achtergrond
-      scene.environmentTexture = null;
 
       const target = new BABYLON.Vector3(0, 0.5, 0); // model lager in beeld
 
@@ -61,7 +60,7 @@
         "camera",
         Math.PI / 2,
         Math.PI / 2.5,
-        7, // zoomniveau
+        10, // zoomniveau
         target,
         scene
       );
@@ -69,7 +68,7 @@
       camera.lowerRadiusLimit = camera.upperRadiusLimit = camera.radius;
 
       const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
-      light.intensity = 1.2;
+      light.intensity = 0.9;
 
       await BABYLON.SceneLoader.ImportMeshAsync(
         "", 
