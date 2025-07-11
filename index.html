@@ -40,7 +40,7 @@
   <script>
     const canvas = document.getElementById("renderCanvas");
     const engine = new BABYLON.Engine(canvas, true);
-    engine.setHardwareScalingLevel(1 / window.devicePixelRatio); // hogere resolutie op retina
+    engine.setHardwareScalingLevel(1 / window.devicePixelRatio); // hogere resolutie
 
     let targetMesh = null;
 
@@ -54,12 +54,14 @@
       const scene = new BABYLON.Scene(engine);
       scene.clearColor = new BABYLON.Color4(1, 1, 1, 1); // echt wit
 
+      const target = new BABYLON.Vector3(0, -0.5, 0); // 👉 camera kijkt iets omlaag
+
       const camera = new BABYLON.ArcRotateCamera(
         "camera",
         Math.PI / 2,
         Math.PI / 2.5,
-        8, // 👉 zoom-out start
-        BABYLON.Vector3.Zero(),
+        10, // 👉 verder uitgezoomd
+        target,
         scene
       );
       camera.attachControl(canvas, true);
@@ -71,7 +73,7 @@
       const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
       light.intensity = 1.2;
 
-      // 🌎 Omgevingslicht zónder skybox/grond
+      // 🌎 Omgevingslicht zónder skybox of grond
       const env = scene.createDefaultEnvironment({
         createSkybox: false,
         createGround: false,
@@ -87,16 +89,16 @@
       ).then((result) => {
         targetMesh = result.meshes[0];
 
-        // Kwaliteit verbeteren
+        // Verbeter textuurkwaliteit
         targetMesh.getChildMeshes().forEach(mesh => {
           if (mesh.material && mesh.material.albedoTexture) {
-            mesh.material.albedoTexture.level = 2.0; // hogere textuurresolutie
+            mesh.material.albedoTexture.level = 2.0;
             mesh.material.albedoTexture.updateSamplingMode(BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
           }
         });
       });
 
-      // 🔧 Antialiasing via FXAA
+      // 🔧 FXAA voor gladde lijnen
       const fxaa = new BABYLON.DefaultRenderingPipeline("defaultPipeline", true, scene, [camera]);
       fxaa.fxaaEnabled = true;
 
