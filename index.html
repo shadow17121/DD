@@ -40,7 +40,7 @@
   <script>
     const canvas = document.getElementById("renderCanvas");
     const engine = new BABYLON.Engine(canvas, true);
-    engine.setHardwareScalingLevel(1 / window.devicePixelRatio); // hogere resolutie
+    engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
 
     let targetMesh = null;
 
@@ -52,35 +52,31 @@
 
     const createScene = async () => {
       const scene = new BABYLON.Scene(engine);
-      scene.clearColor = new BABYLON.Color4(1, 1, 1, 1); // echt wit
+      scene.clearColor = new BABYLON.Color4(1, 1, 1, 1); // witte achtergrond
 
-      const target = new BABYLON.Vector3(0, -0.5, 0); // 👉 camera kijkt iets omlaag
+      const target = new BABYLON.Vector3(0, -1.5, 0); // 👈 model veel lager in frame
 
       const camera = new BABYLON.ArcRotateCamera(
         "camera",
         Math.PI / 2,
         Math.PI / 2.5,
-        10, // 👉 verder uitgezoomd
+        10, // zoomniveau
         target,
         scene
       );
       camera.attachControl(canvas, true);
 
-      // 🔒 Zoom vergrendeld
       camera.lowerRadiusLimit = camera.upperRadiusLimit = camera.radius;
 
-      // Licht
       const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
       light.intensity = 1.2;
 
-      // 🌎 Omgevingslicht zónder skybox of grond
       const env = scene.createDefaultEnvironment({
         createSkybox: false,
         createGround: false,
         environmentIntensity: 1.5
       });
 
-      // 🔄 GLB-model laden
       await BABYLON.SceneLoader.ImportMeshAsync(
         "", 
         "", 
@@ -89,7 +85,6 @@
       ).then((result) => {
         targetMesh = result.meshes[0];
 
-        // Verbeter textuurkwaliteit
         targetMesh.getChildMeshes().forEach(mesh => {
           if (mesh.material && mesh.material.albedoTexture) {
             mesh.material.albedoTexture.level = 2.0;
@@ -98,14 +93,12 @@
         });
       });
 
-      // 🔧 FXAA voor gladde lijnen
       const fxaa = new BABYLON.DefaultRenderingPipeline("defaultPipeline", true, scene, [camera]);
       fxaa.fxaaEnabled = true;
 
       return scene;
     };
 
-    // Kleur aanpassen
     window.setColor = (color) => {
       if (targetMesh && targetMesh.material) {
         targetMesh.material.diffuseColor = BABYLON.Color3.FromHexString(colorMap[color]);
