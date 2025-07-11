@@ -2,47 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>3D Configurator - Babylon.js</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Model Viewer</title>
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; background: white; overflow: hidden; }
-    canvas { width: 100vw; height: 100vh; display: block; }
-    #ui {
-      position: absolute;
-      top: 1rem;
-      left: 1rem;
-      background: rgba(255,255,255,0.95);
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      user-select: none;
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: white;
     }
-    .button {
-      margin: 0.25rem 0;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      background: #007cba;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: bold;
-      transition: background-color 0.3s;
-    }
-    .button:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
-    .button:not(:disabled):hover {
-      background: #005f8c;
-    }
-    #loading {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: Arial, sans-serif;
-      font-size: 1.2rem;
-      color: #444;
+    canvas {
+      width: 100vw;
+      height: 100vh;
+      display: block;
     }
   </style>
   <script src="https://cdn.babylonjs.com/babylon.js"></script>
@@ -50,112 +23,45 @@
 </head>
 <body>
   <canvas id="renderCanvas"></canvas>
-  <div id="ui">
-    <button class="button" id="btnRed" disabled onclick="setColor('red')">Rood</button>
-    <button class="button" id="btnBlue" disabled onclick="setColor('blue')">Blauw</button>
-    <button class="button" id="btnGreen" disabled onclick="setColor('green')">Groen</button>
-  </div>
-  <div id="loading">Model laden...</div>
-
   <script>
     const canvas = document.getElementById("renderCanvas");
     const engine = new BABYLON.Engine(canvas, true);
-    engine.setHardwareScalingLevel(1 / window.devicePixelRatio);
-
     let targetMesh = null;
-
-    const colorMap = {
-      red: "#d7263d",
-      blue: "#1e56a0",
-      green: "#3ebd93"
-    };
-
-    const enableColorButtons = (enabled) => {
-      ["btnRed","btnBlue","btnGreen"].forEach(id => {
-        document.getElementById(id).disabled = !enabled;
-      });
-    };
 
     const createScene = async () => {
       const scene = new BABYLON.Scene(engine);
       scene.clearColor = new BABYLON.Color4(1, 1, 1, 1);
-
-      const target = new BABYLON.Vector3(0, 0.5, 0);
 
       const camera = new BABYLON.ArcRotateCamera(
         "camera",
         Math.PI / 2,
         Math.PI / 3,
         15,
-        target,
+        new BABYLON.Vector3(0, 0.5, 0),
         scene
       );
-
-      // Camera limieten met iets speelruimte
-      camera.lowerRadiusLimit = 12;
-      camera.upperRadiusLimit = 18;
-      camera.lowerBetaLimit = 0.3;   // voorkomt ondergrond kijken
-      camera.upperBetaLimit = Math.PI / 2.2;  // niet te hoog
-
       camera.attachControl(canvas, true);
 
-      const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0), scene);
+      const light = new BABYLON.HemisphericLight(
+        "light",
+        new BABYLON.Vector3(1, 1, 0),
+        scene
+      );
       light.intensity = 1.2;
 
-      // Laden van GLB model
-      await BABYLON.SceneLoader.ImportMeshAsync("", "", "https://raw.githubusercontent.com/shadow17121/DD/main/1Untitled.glb", scene)
-        .then((result) => {
-          // Neem het root mesh als targetMesh
-          targetMesh = result.meshes[0];
-
-          // Model centreren op target (optioneel)
-          let boundingInfo = targetMesh.getHierarchyBoundingVectors(true);
-          let center = boundingInfo.min.add(boundingInfo.max).scale(0.5);
-          targetMesh.position.subtractInPlace(center.subtract(target));
-
-          // Model iets groter maken
-          targetMesh.scaling = new BABYLON.Vector3(2, 2, 2);
-
-          // Materialen updaten
-          targetMesh.getChildMeshes().forEach(mesh => {
-            if (mesh.material) {
-              // Forceer update diffuseColor als diffuseTexture niet aanwezig is
-              if (!mesh.material.albedoTexture) {
-                mesh.material.diffuseColor = new BABYLON.Color3(1, 1, 1);
-              } else {
-                mesh.material.albedoTexture.level = 2.0;
-                mesh.material.albedoTexture.updateSamplingMode(BABYLON.Texture.TRILINEAR_SAMPLINGMODE);
-              }
-              mesh.material.markDirty();
-            }
-          });
-
-          // Knoppen activeren
-          enableColorButtons(true);
-          document.getElementById("loading").style.display = "none";
-        })
-        .catch(err => {
-          console.error("Fout bij laden model:", err);
-          document.getElementById("loading").textContent = "Fout bij laden model!";
-        });
-
-      const fxaa = new BABYLON.DefaultRenderingPipeline("defaultPipeline", true, scene, [camera]);
-      fxaa.fxaaEnabled = true;
+      const result = await BABYLON.SceneLoader.ImportMeshAsync(
+        "",
+        "",
+        "https://raw.githubusercontent.com/shadow17121/DD/main/1Untitled.glb",
+        scene
+      );
+      targetMesh = result.meshes[0];
+      targetMesh.scaling = new BABYLON.Vector3(2, 2, 2); // model groter maken
 
       return scene;
     };
 
-    window.setColor = (color) => {
-      if (!targetMesh) return;
-      targetMesh.getChildMeshes().forEach(mesh => {
-        if (mesh.material) {
-          mesh.material.diffuseColor = BABYLON.Color3.FromHexString(colorMap[color]);
-          mesh.material.markDirty();
-        }
-      });
-    };
-
-    createScene().then((scene) => {
+    createScene().then(scene => {
       engine.runRenderLoop(() => scene.render());
     });
 
